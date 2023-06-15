@@ -41,6 +41,16 @@ class CustomerController extends Controller
         $customer->name = $request->name;
         $customer->customer_id = $request->customer_id;
         $customer->address = $request->address;
+        // Check if a file is uploaded
+        if ($request->hasFile('image')) {
+            if($customer->avatar){
+                Storage::delete('public/images/'.$customer->avatar);
+            }
+            $image = $request->file('image');
+            $imageName = time().'.'.$image->getClientOriginalExtension();
+            $image->move(public_path('images'), $imageName);
+            $customer->avatar = $imageName;
+        }
         $customer->save();
         $message = 'Custommer Successfully Created';
         return redirect()->route('customers.index')->with($message);
