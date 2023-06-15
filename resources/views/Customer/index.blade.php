@@ -73,21 +73,21 @@
                             </ul>
                             <ul class="action">
                                 <li>
-                                        @if(request()->has('view_deleted'))
-                                            <div>
-                                                <a href="{{ route('customers.restore', $customer->id) }}" class="btn btn-success">Restore</a>
-                                            </div>
-                                            <br>
-                                            <div>
-                                                <a href="{{ route('customers.forceDelete', $customer->id) }}" class="btn btn-danger">Force Delete</a>
-                                            </div>
-                                        @else
-                                            <form method="POST" action="{{ route('customers.destroy', $customer->id) }}">
-                                                @csrf
-                                                <input name="_method" type="hidden" value="DELETE">
-                                                <button type="submit" class="btn btn-xs btn-danger btn-flat show_confirm" data-toggle="tooltip" title='Delete'>Delete</button>
-                                            </form>
-                                        @endif
+                                    @if(request()->has('view_deleted'))
+                                        <div>
+                                            <a href="{{ route('customers.restore', $customer->id) }}" class="btn btn-success">Restore</a>
+                                        </div>
+                                        <br>
+                                        <div>
+                                            <a href="{{ route('customers.forceDelete', $customer->id) }}" class="btn btn-danger">Force Delete</a>
+                                        </div>
+                                    @else
+                                        <form method="POST" action="{{ route('customers.destroy', $customer->id) }}">
+                                            @csrf
+                                            <input name="_method" type="hidden" value="DELETE">
+                                            <button type="submit" class="btn btn-xs btn-danger btn-flat show_confirm" data-toggle="tooltip" title='Delete'>Delete</button>
+                                        </form>
+                                    @endif
                                 </li>
                             </ul>
                         </td>

@@ -53,7 +53,8 @@
         </table>
         <div class="text-center">
             <a class="btn btn-primary btn-create" href="{{ route('report.download') }}">
-                <i class="me-2" data-feather="plus-circle"></i>Download PDF
+                <i class="me-2" data-feather="plus-circle"></i>
+                Download PDF
             </a>
         </div>
     </div>

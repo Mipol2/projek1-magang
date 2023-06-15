@@ -20,6 +20,8 @@ use App\Models\Customer;
 Route::get('/', function () {
     return view('welcome');
 });
+
+
 Route::get('customer/force_delete/one/{id}', [CustomerController::class, 'forceDelete'])->name('customers.forceDelete');
 Route::get('customer/restore/one/{id}', [CustomerController::class, 'restore'])->name('customers.restore');
 Route::get('restoreAll', [CustomerController::class, 'restoreAll'])->name('customers.restore.all');
