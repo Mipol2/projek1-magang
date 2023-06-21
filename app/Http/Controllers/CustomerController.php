@@ -3,10 +3,17 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Models\Pesanan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 class CustomerController extends Controller
 {
+    public function welcome()
+    {
+        $customerCount = Customer::count(); // Retrieve the count of customers
+        $orderCount = Pesanan::count(); // Retrieve the count of orders
+        return view('welcome', compact('customerCount', 'orderCount'));
+    }
     public function index(Request $request)
     {   
         $customers = customer::select("*");
@@ -50,7 +57,7 @@ class CustomerController extends Controller
             $imageName = time().'.'.$image->getClientOriginalExtension();
             $image->move(public_path('images'), $imageName);
             $customer->avatar = $imageName;
-        }
+        } 
         $customer->save();
         $message = 'Custommer Successfully Created';
         return redirect()->route('customers.index')->with($message);

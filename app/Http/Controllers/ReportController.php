@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Pesanan;
 use PDF;
 use Illuminate\Http\Request;
 class ReportController extends Controller
 {
+
     public function index(Request $request)    
     {
         $customers = Customer::all();
