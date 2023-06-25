@@ -21,6 +21,8 @@ Route::get('/welcome', function () {
     return view('welcome');
 });
 
+Route::post('/switch-user', 'UserController@switchUser')->name('switch.user');
+
 Route::get('welcome', [CustomerController::class, 'welcome'])->name('welcome');
 Route::get('customer/force_delete/one/{id}', [CustomerController::class, 'forceDelete'])->name('customers.forceDelete');
 Route::get('customer/restore/one/{id}', [CustomerController::class, 'restore'])->name('customers.restore');
@@ -31,3 +33,9 @@ Route::get('report/download', [ReportController::class, 'download'])->name('repo
 Route::resource('report', ReportController::class);
 Route::resource('customers', CustomerController::class);
 Route::resource('pesanans', PesananController::class);
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+
