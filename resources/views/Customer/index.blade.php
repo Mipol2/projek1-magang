@@ -1,112 +1,3 @@
-{{-- <!DOCTYPE html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Customers</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
-    <style>
-        .btn-create {
-            margin-top: 20px;
-            margin-bottom: 20px;
-        }
-        td{
-            text-align: center;
-        }
-        th{
-            text-align: center;
-        }
-    </style>
-</head>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-6">
-                <h1 class="text-center">Customers</h1>
-                <div class="text-center">
-
-                </div>
-            </div>
-        </div>
-        @if(request()->has('view_deleted'))
-        <a href="{{ route('customers.index') }}" class="btn btn-info">View All Users</a>
-        <a href="{{ route('customers.restore.all') }}" class="btn btn-success">Restore All</a>
-        @else
-        <a class="btn btn-primary btn-create" href="{{ route('customers.create') }}">
-            <i class="me-2" data-feather="plus-circle"></i>Create Customer
-        </a>
-        <a href="{{ route('customers.index', ['view_deleted' => 'DeletedRecords']) }}" class="btn btn-primary">View Deleted Records</a>
-        @endif
-        <table id="customer-table" class="table table-dark table-striped">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Customer ID</th>
-                    <th>Address</th>
-                    <th>Avatar</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($customers as $customer)
-                    <tr>
-                        <td>{{ $customer->name }}</td>
-                        <td>{{ $customer->customer_id }}</td>
-                        <td>{{ $customer->address }}</td>
-                        <td>
-                            @if ($customer->avatar)
-                                <img src="{{ asset('images/' . $customer->avatar) }}" alt="Avatar" style="width: 100px;">
-                            @else
-                                No Avatar
-                            @endif
-                        </td>
-                        <td>
-                            <ul class="action">
-                                <li class="edit">
-                                    <a href="{{ route('customers.edit', $customer) }}" class="btn btn-primary">edit</a>
-                                </li>
-                            </ul>
-                            <ul class="action">
-                                <li class="show">
-                                    <a href="{{ route('customers.show', $customer) }}" class="btn btn-primary">show</a>
-                                </li>
-                            </ul>
-                            <ul class="action">
-                                <li>
-                                    @if(request()->has('view_deleted'))
-                                        <div>
-                                            <a href="{{ route('customers.restore', $customer->id) }}" class="btn btn-success">Restore</a>
-                                        </div>
-                                        <br>
-                                        <div>
-                                            <a href="{{ route('customers.forceDelete', $customer->id) }}" class="btn btn-danger">Force Delete</a>
-                                        </div>
-                                    @else
-                                        <form method="POST" action="{{ route('customers.destroy', $customer->id) }}">
-                                            @csrf
-                                            <input name="_method" type="hidden" value="DELETE">
-                                            <button type="submit" class="btn btn-xs btn-danger btn-flat show_confirm" data-toggle="tooltip" title='Delete'>Delete</button>
-                                        </form>
-                                    @endif
-                                </li>
-                            </ul>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('#customer-table').DataTable({
-                "order": [[ 1, "asc" ]] // Sort by second column (index 1) in ascending order
-            });
-        });
-    </script>
-</body>
-</html> --}}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -124,6 +15,11 @@
   <link rel="stylesheet" href="{{asset('template/plugins/datatables-buttons/css/buttons.bootstrap4.min.css')}}">
   <!-- Theme style -->
   <link rel="stylesheet" href="{{asset('template/dist/css/adminlte.min.css')}}">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css" rel="stylesheet" />
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -181,10 +77,12 @@
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
+          <li class="nav-item">
             <a href="{{route('welcome')}}" class="nav-link">
-                <i class="fas fa-th-large nav-icon"></i>
-                <p>Dashboard</p>
+              <i class="fas fa-th-large nav-icon"></i>
+              <p>Dashboard</p>
             </a>
+          </li>
           <li class="nav-item menu-open">
             <a href="#" class="nav-link active">
               <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -213,7 +111,6 @@
                 </a>
               </li>
             </ul>
-
           </li>
         </ul>
       </nav>
@@ -241,120 +138,162 @@
     </section>
     
    <!-- Main content -->
-<section class="content">
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title d-flex justify-content-start">Data customer TeuingNaon</h3>
-            <div class="d-flex justify-content-end">
-              @if(request()->has('view_deleted'))
-              <div class="mx-2">
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title d-flex justify-content-start">Data customer TeuingNaon</h3>
+              <div class="d-flex justify-content-end">
+                @if(request()->has('view_deleted'))
+                <div class="mx-2">
                   <a href="{{ route('customers.index') }}" class="btn btn-info">View All Users</a>
-              </div>
-              <div class="mx-2">
-              <a href="{{ route('customers.restore.all') }}" class="btn btn-success">Restore All</a>
-              @else
-              <div class="mx-2">
-                  <a class="btn btn-primary btn-create" href="{{ route('customers.create') }}">
-                      <i class="me-2" data-feather="plus-circle"></i>Create Customer
-                  </a>
-              </div>
-              <div class="mx-2">
+                </div>
+                <div class="mx-2">
+                  <a href="{{ route('customers.restore.all') }}" class="btn btn-success">Restore All</a>
+                </div>
+                @else
+                <div class="mx-2">
+                  <button class="btn btn-primary btn-create" data-toggle="modal" data-target="#createCustomerModal">
+                    <i class="me-2" data-feather="plus-circle"></i>Create Customer
+                  </button>
+                </div>
+                <div class="mx-2">
                   <a href="{{ route('customers.index', ['view_deleted' => 'DeletedRecords']) }}" class="btn btn-primary">View Deleted Records</a>
-                </a>
+                </div>
                 @endif
               </div>
             </div>
-          </div>
-          <!-- /.card-header -->
-          <div class="card-body">
-            <table id="example2" class="table table-bordered table-hover">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Customer ID</th>
-                  <th>Address</th>
-                  <th>Avatar</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                @foreach ($customers as $customer)
-                <tr>
-                  <td>{{ $customer->name }}</td>
-                  <td>{{ $customer->customer_id }}</td>
-                  <td>{{ $customer->address }}</td>
-                  <td>
-                    @if ($customer->avatar)
-                    <img src="{{ asset('images/' . $customer->avatar) }}" alt="Avatar" style="width: 100px;">
-                    @else
-                    No Avatar
-                    @endif
-                  </td>
-                  <td>
-                    <div class="d-flex justify-content-center">
+            <!-- /.card-header -->
+            <div class="card-body">
+              <table id="example1" class="table table-bordered table-hover">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Customer ID</th>
+                    <th>Address</th>
+                    <th>Avatar</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach ($customers as $customer)
+                  <tr>
+                    <td>{{ $customer->name }}</td>
+                    <td>{{ $customer->customer_id }}</td>
+                    <td>{{ $customer->address }}</td>
+                    <td>
+                      @if ($customer->image)
+                      <img src="{{ asset('storage/images/' . $customer->image) }}" alt="Avatar" style="width: 100px;">
+                      @else
+                      No Avatar
+                      @endif
+                    </td>
+                    <td>
+                      <div class="d-flex justify-content-center">
                         @if(request()->has('view_deleted'))
                         <div class="mx-2">
-                            <a href="{{ route('customers.restore', $customer->id) }}" class="btn btn-block btn-success" style="width: 100px">Restore</a>
-                            
+                          <a href="{{ route('customers.restore', $customer->id) }}" class="btn btn-block btn-success" style="width: 100px">Restore</a>
                         </div>
                         <div class="mx-2">
-                            <a href="{{ route('customers.forceDelete', $customer->id) }}" type="button" class="btn btn-block btn-danger">Force Delete</a>
-
+                          <a href="{{ route('customers.forceDelete', $customer->id) }}" type="button" class="btn btn-block btn-danger">Force Delete</a>
                         </div>
                         @else
                         <div class="mx-2">
-                            <a href="{{ route('customers.edit', $customer) }}" type="button" class="btn btn-block btn-primary" style="width: 75px">edit</a>
-                          </div>
-                          <div class="mx-2">
-                            <a href="{{ route('customers.show', $customer) }}" type="button" class="btn btn-block btn-success" style="width: 75px">show</a>
-                          </div>
-                          <div class="mx-2">
-                        <form id="delete-form-{{ $customer->id }}" action="{{ route('customers.destroy', $customer) }}" method="POST" style="display: inline;">
-                          @csrf
-                          @method('DELETE')
+                          <a href="{{ route('customers.edit', $customer) }}" type="button" class="btn btn-block btn-primary" style="width: 75px">edit</a>
                         </div>
-                          <button type="submit" class="btn btn-block btn-danger" style="width: 75px">Delete</button>
-                        </form>
+                        <div class="mx-2">
+                          <a href="{{ route('customers.show', $customer) }}" type="button" class="btn btn-block btn-success" style="width: 75px">show</a>
+                        </div>
+                        <div class="mx-2">
+                          <form id="delete-form-{{ $customer->id }}" action="{{ route('customers.destroy', $customer) }}" method="POST" style="display: inline;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-block btn-danger" style="width: 75px">Delete</button>
+                          </form>
+                        </div>
                         @endif
-                    </div>
-                  </td>
-                </tr>
-                @endforeach
-              </tbody>
-            </table>
+                      </div>
+                    </td>
+                  </tr>
+                  @endforeach
+                </tbody>
+              </table>
+            </div>
+            <!-- /.card-body -->
           </div>
-          <!-- /.card-body -->
+          <!-- /.card -->
         </div>
-        <!-- /.card -->
+        <!-- /.col -->
       </div>
-      <!-- /.col -->
+      <!-- /.row -->
     </div>
-    <!-- /.row -->
-  </div>
-  <!-- /.container-fluid -->
-</section>
-<!-- /.content -->
+    <!-- /.container-fluid -->
+  </section>
+  <!-- /.content -->
 </div>
-  <!-- /.content-wrapper -->
-  <footer class="main-footer">
-    <div class="float-right d-none d-sm-block">
-      <b>Version</b> 3.2.0
+<!-- /.content-wrapper -->
+    <!-- Create Customer Modal -->
+    <div class="modal fade" id="createCustomerModal" tabindex="-1" role="dialog" aria-labelledby="createCustomerModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="createCustomerModalLabel">Create Customer</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="createCustomerForm" enctype="multipart/form-data">
+              @csrf
+              <div class="mb-3">
+                <label for="name" class="form-label">Name:</label>
+                <input type="text" name="name" id="name" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label for="customer_id" class="form-label">Customer ID:</label>
+                <input type="number" name="customer_id" id="customer_id" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label for="address" class="form-label">Address:</label>
+                <input type="text" name="address" id="address" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label for="image" class="form-label">Select Image:</label>
+                <input type="file" name="image" id="image" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label for="preview-image">Preview:</label>
+                <img id="preview-image-before-upload" src="{{asset('images/no-preview-available.png')}}" alt="preview image" style="max-height: 250px;">
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Create</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
-    <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights reserved.
-  </footer>
+<footer class="main-footer">
+  <div class="float-right d-none d-sm-block">
+    <b>Version</b> 3.2.0
+  </div>
+  <strong>&copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights reserved.
+</footer>
 
-  <!-- Control Sidebar -->
-  <aside class="control-sidebar control-sidebar-dark">
-    <!-- Control sidebar content goes here -->
-  </aside>
-  <!-- /.control-sidebar -->
+<!-- Control Sidebar -->
+<aside class="control-sidebar control-sidebar-dark">
+  <!-- Control sidebar content goes here -->
+</aside>
+<!-- /.control-sidebar -->
 </div>
 <!-- ./wrapper -->
 
 <!-- jQuery -->
+@include('sweetalert::alert')
+@include('sweetalert::alert', ['cdn' => "https://cdn.jsdelivr.net/npm/sweetalert2@9"])
 <script src="{{asset('template/plugins/jquery/jquery.min.js')}}"></script>
 <!-- Bootstrap 4 -->
 <script src="{{asset('template/plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
@@ -373,8 +312,7 @@
 <script src="{{asset('template/plugins/datatables-buttons/js/buttons.colVis.min.js')}}"></script>
 <!-- AdminLTE App -->
 <script src="{{asset('template/dist/js/adminlte.min.js')}}"></script>
-{{-- <!-- AdminLTE for demo purposes -->
-<script src="{{asset('template/dist/js/demo.js')}}"></script> --}}
+<script src="{{ asset('vendor/sweetalert/sweetalert.all.js') }}"></script>
 <!-- Page specific script -->
 <script>
   $(function () {
@@ -393,5 +331,71 @@
     });
   });
 </script>
+
+<!-- Page specific script -->
+<script>
+  $(function () {
+    // Create Customer form submit using AJAX
+    $('#createCustomerForm').submit(function (e) {
+      e.preventDefault();
+      var form = $(this);
+      var url = form.attr('action');
+      var formData = new FormData(form[0]);
+
+      $.ajax({
+        url: url,
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: {
+         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        beforeSend: function () {
+          form.find('.is-invalid').removeClass('is-invalid');
+          form.find('.invalid-feedback').text('');
+        },
+        success:function(response){
+          //show success message
+          Swal.fire({
+              type: 'success',
+              icon: 'success',
+              title: `${response.message}`,
+              showConfirmButton: false,
+              timer: 3000
+          }).then((result) => {
+            if (result.dismiss == Swal.DismissReason.timer){
+              window.location.href = "{{route('customers.index')}}";
+            }
+          });
+        },
+        error: function (xhr) {
+          var errors = xhr.responseJSON.errors;
+          $.each(errors, function (key, value) {
+            $('#' + key).addClass('is-invalid');
+            $('#' + key + 'Error').text(value[0]);
+          });
+        }
+      });
+    });
+
+    // Preview selected image before upload
+    $('#image').change(function () {
+      var input = this;
+      var url = $(this).val();
+      var ext = url.substring(url.lastIndexOf('.') + 1).toLowerCase();
+      if (input.files && input.files[0] && (ext === 'gif' || ext === 'png' || ext === 'jpeg' || ext === 'jpg')) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          $('#preview-image-before-upload').attr('src', e.target.result);
+        };
+        reader.readAsDataURL(input.files[0]);
+      } else {
+        $('#preview-image-before-upload').attr('src', '{{asset('images/no-preview-available.png')}}');
+      }
+    });
+  });
+</script>
+
 </body>
 </html>

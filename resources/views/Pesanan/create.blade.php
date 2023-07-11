@@ -259,6 +259,7 @@
 <script src="{{asset('template/plugins/datatables-buttons/js/buttons.colVis.min.js')}}"></script>
 <!-- AdminLTE App -->
 <script src="{{asset('template/dist/js/adminlte.min.js')}}"></script>
+<script src="{{ asset('vendor/sweetalert/sweetalert.all.js') }}"></script>
 <!-- AdminLTE for demo purposes -->
 <!-- Page specific script -->
 <script>
@@ -278,5 +279,10 @@
     });
   });
 </script>
+
+<script>
+
+</script>
+
 </body>
 </html>

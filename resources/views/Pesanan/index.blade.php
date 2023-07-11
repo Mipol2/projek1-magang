@@ -1,112 +1,3 @@
-{{-- <!DOCTYPE html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Customers</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
-    <style>
-        .btn-create {
-            margin-top: 20px;
-            margin-bottom: 20px;
-        }
-        td{
-            text-align: center;
-        }
-        th{
-            text-align: center;
-        }
-    </style>
-</head>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-6">
-                <h1 class="text-center">Customers</h1>
-                <div class="text-center">
-
-                </div>
-            </div>
-        </div>
-        @if(request()->has('view_deleted'))
-        <a href="{{ route('customers.index') }}" class="btn btn-info">View All Users</a>
-        <a href="{{ route('customers.restore.all') }}" class="btn btn-success">Restore All</a>
-        @else
-        <a class="btn btn-primary btn-create" href="{{ route('customers.create') }}">
-            <i class="me-2" data-feather="plus-circle"></i>Create Customer
-        </a>
-        <a href="{{ route('customers.index', ['view_deleted' => 'DeletedRecords']) }}" class="btn btn-primary">View Deleted Records</a>
-        @endif
-        <table id="customer-table" class="table table-dark table-striped">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Customer ID</th>
-                    <th>Address</th>
-                    <th>Avatar</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($customers as $customer)
-                    <tr>
-                        <td>{{ $customer->name }}</td>
-                        <td>{{ $customer->customer_id }}</td>
-                        <td>{{ $customer->address }}</td>
-                        <td>
-                            @if ($customer->avatar)
-                                <img src="{{ asset('images/' . $customer->avatar) }}" alt="Avatar" style="width: 100px;">
-                            @else
-                                No Avatar
-                            @endif
-                        </td>
-                        <td>
-                            <ul class="action">
-                                <li class="edit">
-                                    <a href="{{ route('customers.edit', $customer) }}" class="btn btn-primary">edit</a>
-                                </li>
-                            </ul>
-                            <ul class="action">
-                                <li class="show">
-                                    <a href="{{ route('customers.show', $customer) }}" class="btn btn-primary">show</a>
-                                </li>
-                            </ul>
-                            <ul class="action">
-                                <li>
-                                    @if(request()->has('view_deleted'))
-                                        <div>
-                                            <a href="{{ route('customers.restore', $customer->id) }}" class="btn btn-success">Restore</a>
-                                        </div>
-                                        <br>
-                                        <div>
-                                            <a href="{{ route('customers.forceDelete', $customer->id) }}" class="btn btn-danger">Force Delete</a>
-                                        </div>
-                                    @else
-                                        <form method="POST" action="{{ route('customers.destroy', $customer->id) }}">
-                                            @csrf
-                                            <input name="_method" type="hidden" value="DELETE">
-                                            <button type="submit" class="btn btn-xs btn-danger btn-flat show_confirm" data-toggle="tooltip" title='Delete'>Delete</button>
-                                        </form>
-                                    @endif
-                                </li>
-                            </ul>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('#customer-table').DataTable({
-                "order": [[ 1, "asc" ]] // Sort by second column (index 1) in ascending order
-            });
-        });
-    </script>
-</body>
-</html> --}}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -124,6 +15,8 @@
   <link rel="stylesheet" href="{{asset('template/plugins/datatables-buttons/css/buttons.bootstrap4.min.css')}}">
   <!-- Theme style -->
   <link rel="stylesheet" href="{{asset('template/dist/css/adminlte.min.css')}}">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -176,15 +69,16 @@
         </div>
       </div>
 
-      <!-- Sidebar Menu -->
-      <nav class="mt-2">
-        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-          <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
-            <a href="{{route('welcome')}}" class="nav-link">
-                <i class="fas fa-th-large nav-icon"></i>
-                <p>Dashboard</p>
-            </a>
+    <!-- Sidebar Menu -->
+    <nav class="mt-2">
+      <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <!-- Add icons to the links using the .nav-icon class
+             with font-awesome or any other icon font library -->
+        <li class="nav-item menu-open">
+          <a href="{{route('welcome')}}" class="nav-link">
+            <i class="fas fa-th-large nav-icon"></i>
+              <p>Dashboard</p>
+          </a>
           <li class="nav-item menu-open">
             <a href="#" class="nav-link active">
               <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -194,24 +88,28 @@
               </p>
             </a>
             <ul class="nav nav-treeview">
+              @if (Auth::user()->hasRole('super-admin'))
               <li class="nav-item">
                 <a href="{{route('customers.index')}}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Customers</p>
                 </a>
               </li>
+              @endif
               <li class="nav-item">
                 <a href="{{route('pesanans.index')}}" class="nav-link active">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Orders</p>
                 </a>
               </li>
+              @if (Auth::user()->hasRole('super-admin'))
               <li class="nav-item">
                 <a href="{{route('report.index')}}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Report</p>
                 </a>
               </li>
+              @endif
             </ul>
 
           </li>
@@ -249,9 +147,11 @@
           <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
               <h3 class="card-title">Data pesanan TeuingNaon</h3>
-              <a class="btn btn-primary btn-create" href="{{ route('pesanans.create') }}">
-                <i class="me-2" data-feather="plus-circle"></i>Create Pesanan
-              </a>
+                <div class="mx-2">
+                  <button class="btn btn-primary btn-create" data-toggle="modal" data-target="#createPesananModal">
+                    <i class="me-2" data-feather="plus-circle"></i>Create Pesanan
+                  </button>
+                </div>
             </div>
           </div>
           <!-- /.card-header -->
@@ -311,6 +211,62 @@
 <!-- /.content -->
 </div>
   <!-- /.content-wrapper -->
+  <!-- Create Customer Modal -->
+  <div class="modal fade" id="createPesananModal" tabindex="-1" role="dialog" aria-labelledby="createPesananModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createPesananModalLabel">Create Pesanan</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body d-flex justify-content-center">
+          <form id="createPesananForm" action="{{ route('pesanans.store') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+              <div class="mb-3">
+                <div class="form-group">
+                  <label for="id_customer">Nama Customer</label>
+                  <select name="id_customer" id="id_customer" class="form-select" autocomplete="off" required>
+                      <option value="" selected disabled hidden>Select nama customer..</option>
+                      @foreach ($customers as $customer)
+                          <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                      @endforeach
+                  </select>
+                </div>
+              </div>
+      
+              <div class="mb-3">
+                  <label for="id_barang">Nama Barang</label>
+                  <select name="id_barang" id="id_barang" class="form-select" autocomplete="off" required onchange="updateHarga()">
+                      <option value="" selected disabled hidden>Select barang..</option>
+                      @foreach ($barangs as $barang)
+                          <option value="{{ $barang->id }}" data-harga="{{ $barang->harga_barang }}">{{ $barang->nama_barang }}</option>
+                      @endforeach
+                  </select>
+              </div>
+              
+              <div class="mb-3">
+                  <label for="harga_barang">Harga Barang</label>
+                  <input type="number" name="harga_barang" id="harga_barang" class="form-control" readonly>
+              </div>
+              <div class="mb-3">
+                  <label for="jumlah_barang">Jumlah</label>
+                  <input type="number" name="jumlah_barang" id="jumlah_barang" class="form-control" onchange="calculateTotal()"  onkeydown="return event.keyCode !== 69">
+              </div>
+              <div class="mb-3">
+                  <label for="harga_total">Harga Total</label>
+                  <input type="number" name="harga_total" id="harga_total" class="form-control" readonly>
+              </div>
+
+              <div class="text-center">
+                  <button type="submit"  class="btn-block btn-primary">Submit</button>
+              </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
   <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
       <b>Version</b> 3.2.0
@@ -345,6 +301,9 @@
 <script src="{{asset('template/plugins/datatables-buttons/js/buttons.colVis.min.js')}}"></script>
 <!-- AdminLTE App -->
 <script src="{{asset('template/dist/js/adminlte.min.js')}}"></script>
+<!-- Swal -->
+<script src="{{ asset('vendor/sweetalert/sweetalert.all.js') }}"></script>
+
 {{-- <!-- AdminLTE for demo purposes -->
 <script src="{{asset('template/dist/js/demo.js')}}"></script> --}}
 <!-- Page specific script -->
@@ -362,6 +321,75 @@
       "info": true,
       "autoWidth": false,
       "responsive": true,
+    });
+  });
+</script>
+<script>
+    function updateHarga() {
+        var selectElement = document.getElementById("id_barang");
+        var selectedOption = selectElement.options[selectElement.selectedIndex];
+        var hargaBarang = selectedOption.getAttribute("data-harga");
+
+        document.getElementById("harga_barang").value = hargaBarang;
+    }
+
+    function calculateTotal() {
+    var idBarang = document.getElementById("id_barang").value;
+    var jumlahBarang = document.getElementById("jumlah_barang").value;
+
+    var selectedOption = document.querySelector('#id_barang option[value="' + idBarang + '"]');
+    var hargaBarang = parseFloat(selectedOption.getAttribute("data-harga"));
+
+    var hargaTotal = hargaBarang * jumlahBarang;
+    document.getElementById("harga_total").value = hargaTotal;
+}
+</script>
+c
+<!-- Page specific script -->
+<script>
+  $(function () {
+    // Create Pesanan form submit using AJAX
+    $('#createPesananForm').submit(function (e) {
+      e.preventDefault();
+      var form = $(this);
+      var url = form.attr('action');
+      var formData = new FormData(form[0]);
+
+      $.ajax({
+        url: url,
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: {
+         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        beforeSend: function () {
+          form.find('.is-invalid').removeClass('is-invalid');
+          form.find('.invalid-feedback').text('');
+        },
+        success:function(response){
+          //show success message
+          Swal.fire({
+              type: 'success',
+              icon: 'success',
+              title: `${response.message}`,
+              showConfirmButton: false,
+              timer: 3000
+          }).then((result) => {
+            if (result.dismiss == Swal.DismissReason.timer){
+              window.location.href = "{{route('pesanans.index')}}";
+            }
+          });
+        },
+        error: function (xhr) {
+          var errors = xhr.responseJSON.errors;
+          $.each(errors, function (key, value) {
+            $('#' + key).addClass('is-invalid');
+            $('#' + key + 'Error').text(value[0]);
+          });
+        }
+      });
     });
   });
 </script>

@@ -147,7 +147,7 @@
               </div>
               <!-- /.card-header -->
               <div class="card-body d-flex justify-content-center align-items-center">
-                <form action="{{ route('customers.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('customers.store') }}" method="POST" enctype='multipart/form-data'>
                     @csrf
                     @method('POST')
             

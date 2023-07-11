@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('customer_id')->unique();
             $table->string('name');
             $table->string('address');
-            $table->longText('avatar')->nullable();
+            $table->longText('image')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

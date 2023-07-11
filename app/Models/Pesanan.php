@@ -17,4 +17,11 @@ class Pesanan extends Model
     {
         return $this->belongsTo(Barang::class, 'id_barang');
     }
+    protected $fillable = [
+        'id_customer',
+        'id_barang',
+        'jumlah_barang',
+        'harga_total',
+    ];
+
 }

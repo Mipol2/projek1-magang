@@ -1,88 +1,3 @@
-{{-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Edit</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <h1 class="text-center">Edit pesanan</h1>
-    <div class="container d-flex justify-content-center">
-        <form action="{{ route('pesanans.update', $pesanan) }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
-
-            <div class="mb-3">
-                <label for="id_customer" class="form-label">Nama Customer:</label>
-                <select name="id_customer" id="id_customer" class="form-select form-control" autocomplete="off" required>
-                    <option value="" selected disabled hidden>Select nama customer..</option>
-                    @foreach ($customers as $customer)
-                        <option value="{{ $customer->id }}" {{ $pesanan->id_customer == $customer->id ? 'selected' : '' }}>{{ $customer->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label for="id_barang" class="form-label">nama barang:</label>
-                <select name="id_barang" id="id_barang" class="form-select form-control" autocomplete="off" required onchange="updateHarga()">
-                    <option value="" selected disabled hidden>Select barang..</option>
-                    @foreach ($barangs as $barang)
-                    <option value="{{ $barang->id }}" data-harga="{{ $barang->harga_barang }}" {{ $pesanan->id_barang == $barang->id ? 'selected' : '' }}>{{ $barang->nama_barang }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div>
-                <label for="harga_barang">Harga Barang:</label>
-                <input type="number" name="harga_barang" id="harga_barang" class="form-control" value="{{ $pesanan->barang->harga_barang }}" onchange="calculateTotal()" readonly>
-            </div>
-
-            <div class="mb-3">
-                <label for="jumlah_barang" class="form-label">jumlah barang:</label>
-                <input type="number" name="jumlah_barang" id="jumlah_barang" class="form-control" value="{{ $pesanan->jumlah_barang }}" onchange="calculateTotal()"  onkeydown="return event.keyCode !== 69">
-            </div>
-
-
-            <div class="mb-3">
-                <label for="harga_total">Harga Total:</label>
-                <input type="number" name="harga_total" id="harga_total" class="form-control"  value="{{ $pesanan->harga_total }}" readonly>
-            </div>
-
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </div>
-        </form>
-    </div>
-    <script>
-function updateHarga() {
-    var selectElement = document.getElementById("id_barang");
-    var selectedOption = selectElement.options[selectElement.selectedIndex];
-    var hargaBarang = selectedOption.getAttribute("data-harga");
-
-    document.getElementById("harga_barang").value = hargaBarang;
-    
-    calculateTotal(); // Call calculateTotal() after updating harga_barang
-}
-
-function calculateTotal() {
-    var idBarang = document.getElementById("id_barang").value;
-    var jumlahBarang = document.getElementById("jumlah_barang").value;
-
-    var selectedOption = document.querySelector('#id_barang option[value="' + idBarang + '"]');
-    var hargaBarang = parseFloat(selectedOption.getAttribute("data-harga"));
-
-    var hargaTotal = hargaBarang * jumlahBarang;
-    document.getElementById("harga_total").value = hargaTotal;
-}
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html> --}}
-
-
-
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -101,6 +16,7 @@ function calculateTotal() {
         <link rel="stylesheet" href="{{asset('template/plugins/datatables-buttons/css/buttons.bootstrap4.min.css')}}">
         <!-- Theme style -->
         <link rel="stylesheet" href="{{asset('template/dist/css/adminlte.min.css')}}">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
       </head>
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
@@ -189,7 +105,6 @@ function calculateTotal() {
                 </a>
               </li>
             </ul>
-
           </li>
         </ul>
       </nav>
@@ -225,7 +140,7 @@ function calculateTotal() {
                       <h3 class="card-title">Edit Pesanan</h3>
                     </div>
                     <div class="card-body d-flex justify-content-center">
-                        <form action="{{ route('pesanans.update', $pesanan) }}" method="POST" enctype="multipart/form-data">
+                        <form id="form-update" action="{{ route('pesanans.update', $pesanan) }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                 
@@ -347,6 +262,9 @@ function calculateTotal() {
 <script src="{{asset('template/plugins/datatables-buttons/js/buttons.colVis.min.js')}}"></script>
 <!-- AdminLTE App -->
 <script src="{{asset('template/dist/js/adminlte.min.js')}}"></script>
+<!-- Swal -->
+<script src="{{ asset('vendor/sweetalert/sweetalert.all.js') }}"></script>
+
 <!-- AdminLTE for demo purposes -->
 <!-- Page specific script -->
 <script>
@@ -366,5 +284,88 @@ function calculateTotal() {
     });
   });
 </script>
+<script>
+  $(document).ready(function() {
+      $('#form-update').submit(function(event) {
+          event.preventDefault();
+
+          var formData = $(this).serialize();
+
+          if (formData.length > 0) {
+              $('#form-update :input').removeClass('is-invalid');
+              $('#form-update :input').addClass('is-valid');
+
+              // Hapus pesan kesalahan
+              $('#form-update :input').parent().next('.invalid-feedback').hide();
+
+              let isFormValid = false;
+          }
+
+          $.ajax({
+              url: $(this).attr('action'),
+              type: $(this).attr('method'),
+              data: formData,
+              dataType: 'json',
+              success: function(response) {
+                  console.log(response);
+                  var message = response.message;
+
+                  if (response.success) {
+                      Swal.fire({
+                          html: '<strong>' + message + '</strong>',
+                          icon: 'success',
+                          toast: true,
+                          position: 'top-end',
+                          showConfirmButton: false,
+                          timer: 1100
+                      }).then((result) => {
+                          if (result.dismiss === Swal.DismissReason.timer) {
+                              window.location.href = "{{ route('pesanans.index') }}";
+                          }
+                      });
+                  } else {
+                      Swal.fire({
+                          title: 'Error!',
+                          html: '<strong>' + response.message + '</strong>',
+                          icon: 'error',
+                          confirmButtonColor: '#534686'
+                      });
+                  }
+              },
+              error: function(error) {
+                  console.log(error);
+                  if (error['responseJSON']) {
+                      if (error['responseJSON']['errors']) {
+
+                          const errors = error['responseJSON']['errors'];
+                          let index = 0;
+
+                          // Hapus pesan kesalahan
+                          for (const key in errors) {
+                              $('#' + key.replace(/\./g, "\\.")).addClass('is-invalid');
+
+                              if ($('#' + key.replace(/\./g, "\\.")).parent().next(
+                                      '.invalid-feedback').length) {
+                                  $('#' + key.replace(/\./g, "\\.")).parent().next(
+                                      '.invalid-feedback').show().text(errors[key][0]);
+                              } else {
+                                  $('#' + key.replace(/\./g, "\\.")).next(
+                                      '.invalid-feedback').show().text(errors[key][0]);
+                              }
+
+                              if (index == 0) {
+                                  $('#' + key.replace(/\./g, "\\.")).focus();
+                              }
+
+                              index++;
+                          }
+                      }
+                  }
+              }
+          })
+      })
+  });
+</script>
+
 </body>
 </html>

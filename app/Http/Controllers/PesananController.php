@@ -7,16 +7,18 @@ use App\Models\Barang;
 use App\Models\Pesanan;
 use App\Models\Customer;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Validator;
 
 class PesananController extends Controller
 {
 
     public function index(Request $request)
     {
+        $customers = Customer::all();
+        $barangs = Barang::all();
         $pesanans = Pesanan::with('barang')->get();
         $pesanans = Pesanan::with('customer')->get();
-        return view('Pesanan.index', compact('pesanans'));   
+        return view('Pesanan.index', compact('customers', 'barangs', 'pesanans'));   
     }
     
     public function show($id)
@@ -42,27 +44,70 @@ class PesananController extends Controller
 
     public function store(Request $request)
     {
-        $pesanan = new Pesanan;
-        $pesanan->id_customer = $request->id_customer;
-        $pesanan->id_barang = $request->id_barang;
-        $pesanan->jumlah_barang = $request->jumlah_barang;
-        $pesanan->harga_total = $request->harga_total;
+        //define validation rules
+        $validator = Validator::make($request->all(), [
+            'id_customer' => 'required',
+            'id_barang' => 'required',
+            'jumlah_barang' => 'required',
+            'harga_total' => 'required',
+        ]);
+
+        //check if validation fails
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        //create post
+        $pesanan = Pesanan::create([
+            'id_customer'     => $request->id_customer, 
+            'id_barang'   => $request->id_barang,
+            'jumlah_barang'   =>  $request->jumlah_barang,
+            'harga_total' => $request->harga_total
+        ]);
+
+
         $pesanan->save();
-        $message = 'Pesanan Successfully Created';
-        return redirect()->route('pesanans.index')->with($message);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data Berhasil Disimpan!',
+            'data'    => $pesanan  
+        ]);
     }
 
     public function update(Request $request, $id)
     {
-        $pesanan = Pesanan::findOrFail($id);
-        // Isi dengan field lainnya
-        $pesanan->id_customer = $request->id_customer;
-        $pesanan->id_barang = $request->id_barang;
-        $pesanan->jumlah_barang = $request->jumlah_barang;
-        $pesanan->harga_total = $request->harga_total;
-        $pesanan->save();
-        $message = 'Pesanan Successfully Updated';
-        return redirect()->route('pesanans.index')->with($message);
+        $validated = $request->validate([
+            'id_customer' => 'required',
+            'id_barang' => 'required',
+            'jumlah_barang' => 'required',
+            'harga_total' => 'required',
+        ]);
+
+        try {
+            $pesanan = Pesanan::findOrFail($id);
+            // Isi dengan field lainnya
+            $pesanan->id_customer = $request->id_customer;
+            $pesanan->id_barang = $request->id_barang;
+            $pesanan->jumlah_barang = $request->jumlah_barang;
+            $pesanan->harga_total = $request->harga_total;
+            $pesanan->save();
+
+            return response()->json([
+                'status' => 200,
+                'success' => true,
+                'message' => 'Pesanan created successfully.',
+            ]);
+        } catch (Exception $e) {
+            DB::rollback();
+            Log::error($e->getMessage());
+
+            return response()->json([
+                'status' => 500,
+                'success' => false,
+                'message' => 'Pesanan failed to create.',
+            ]);
+        }
         
     }
 

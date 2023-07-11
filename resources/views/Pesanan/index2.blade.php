@@ -176,15 +176,16 @@
         </div>
       </div>
 
-      <!-- Sidebar Menu -->
-      <nav class="mt-2">
-        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-          <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
-            <a href="{{route('welcome')}}" class="nav-link">
-                <i class="fas fa-th-large nav-icon"></i>
-                <p>Dashboard</p>
-            </a>
+    <!-- Sidebar Menu -->
+    <nav class="mt-2">
+      <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <!-- Add icons to the links using the .nav-icon class
+             with font-awesome or any other icon font library -->
+        <li class="nav-item menu-open">
+          <a href="{{route('welcome')}}" class="nav-link">
+            <i class="fas fa-th-large nav-icon"></i>
+              <p>Dashboard</p>
+          </a>
           <li class="nav-item menu-open">
             <a href="#" class="nav-link active">
               <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -194,24 +195,28 @@
               </p>
             </a>
             <ul class="nav nav-treeview">
+              @if (Auth::user()->hasRole('super-admin'))
               <li class="nav-item">
-                <a href="{{route('customers.index')}}" class="nav-link active">
+                <a href="{{route('customers.index')}}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Customers</p>
                 </a>
               </li>
+              @endif
               <li class="nav-item">
-                <a href="{{route('pesanans.index')}}" class="nav-link">
+                <a href="{{route('pesanans.index')}}" class="nav-link active">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Orders</p>
                 </a>
               </li>
+              @if (Auth::user()->hasRole('super-admin'))
               <li class="nav-item">
-                <a href="route{{('barangs.index')}}" class="nav-link">
+                <a href="{{route('report.index')}}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Report</p>
                 </a>
               </li>
+              @endif
             </ul>
 
           </li>
@@ -228,12 +233,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Customer</h1>
+            <h1>Order</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Customer</li>
+              <li class="breadcrumb-item active">Order</li>
             </ol>
           </div>
         </div>
@@ -249,7 +254,7 @@
           <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
               <h3 class="card-title">Data pesanan TeuingNaon</h3>
-              <a class="btn btn-primary btn-create" href="{{ route('customers.create') }}">
+              <a class="btn btn-primary btn-create" href="{{ route('pesanans.create') }}">
                 <i class="me-2" data-feather="plus-circle"></i>Create Pesanan
               </a>
             </div>
@@ -276,25 +281,22 @@
                         <td>{{ $pesanan->jumlah_barang }}</td>
                         <td>{{ 'Rp' . number_format($pesanan->harga_total, 0, ',', '.') }}</td>
                         <td>
-                            <ul class="action">
-                                <li class="edit">
-                                    <a href="{{ route('pesanans.edit', $pesanan) }}">edit</a>
-                                </li>
-                            </ul>
-                            <ul class="action">
-                                <li class="show">
-                                    <a href="{{ route('pesanans.show', $pesanan) }}">show</a>
-                                </li>
-                            </ul>
-                            <ul class="action">
-                                <li class="delete">
-                                    <a href="{{ route('pesanans.destroy', $pesanan) }}" onclick="event.preventDefault(); document.getElementById('delete-form-{{ $pesanan->id }}').submit();">delete</a>
+                            <div class="d-flex justify-content-center">
+                                <div class="mx-2">
+                                    <a href="{{ route('pesanans.edit', $pesanan) }}" type="button" class="btn btn-primary" style="width: 75px">edit</a>
+                                </div>
+                           
+                                <div class="mx-2">
+                                    <a href="{{ route('pesanans.show', $pesanan) }}" type="button" class="btn btn-success" style="width: 75px">show</a>
+                                </div>
+                                <div class="mx-2">
+                                    <a href="{{ route('pesanans.destroy', $pesanan) }}" onclick="event.preventDefault(); document.getElementById('delete-form-{{ $pesanan->id }}').submit();" type="button" class="btn btn-danger" style="width: 75px">delete</a>
                                     <form id="delete-form-{{ $pesanan->id }}" action="{{ route('pesanans.destroy', $pesanan) }}" method="POST" style="display: none;">
                                         @csrf
                                         @method('DELETE')
-                                    </form>
-                                </li>
-                            </ul>
+                                </div>
+                            </div>
+                        </form>
                         </td>
                     </tr>
                 @endforeach
